@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "StyleSathy",
+    "slug": "stylesathy",
+    "version": "2.4.1",
+    "orientation": "portrait",
+    "scheme": "com.darknessfallxd.stylesathi",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "backgroundColor": "#F4F4F4",
+    "primaryColor": "#FF6B8A",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.stylesathy.app"
+    },
+    "android": {
+      "package": "com.darknessfallxd.stylesathi",
+      "versionCode": 1
+    },
+    "owner": "darknessfallxd",
+    "plugins": ["expo-web-browser"]
+  }
+}
