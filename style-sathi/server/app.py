@@ -7,6 +7,7 @@ from api.audio import audio_router
 from api.subscription import subscription_router
 from api.search import search_router
 from api.tryon import tryon_router
+from api.images import images_router
 
 app = FastAPI()
 
@@ -26,6 +27,7 @@ app.include_router(subscription_router, prefix="/subscription")
 app.include_router(preferences_router, prefix="/preferences")
 app.include_router(search_router, prefix="/search")
 app.include_router(tryon_router, prefix="/try-on")
+app.include_router(images_router, prefix="/images")
 
 if __name__ == "__main__":
     import uvicorn
