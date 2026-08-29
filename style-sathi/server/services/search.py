@@ -124,7 +124,7 @@ def process_search(
         raise AppException("Query is required", 400)
 
     query = query.strip()
-    print(f"🔎 SEARCH CALLED: query={query}, category={category}")
+    print(f"SEARCH CALLED: query={query}, category={category}")
     if not location:
         if user_id:
             location = detect_location_from_user(supabase_client, user_id)
@@ -137,12 +137,12 @@ def process_search(
     keywords = extract_keywords(query)
     keyword_str = " ".join(keywords)
 
-    print(f"📍 LOCATION: {location}")
-    print(f"📦 CATEGORY: {category}")
+    print(f"LOCATION: {location}")
+    print(f"CATEGORY: {category}")
 
     vector_results = []
     if location == "NP":
-        print("🔍 Starting vector search...")
+        print("Starting vector search...")
         try:
             vector_results = vector_search(
             
@@ -151,11 +151,11 @@ def process_search(
                 location=location,
                 category=category,
             )
-            print(f"🔍 VECTOR SEARCH: {len(vector_results)} products found")
+            print(f"VECTOR SEARCH: {len(vector_results)} products found")
         except Exception as e:
-             print(f"❌ VECTOR SEARCH ERROR: {e}")
+             print(f"VECTOR SEARCH ERROR: {e}")
 
-    print(f"🧩 CATEGORY FILTER: {category}")
+    print(f"CATEGORY FILTER: {category}")
 
     # ---------- FALLBACK: if vector search returned nothing ----------
     if not vector_results:
