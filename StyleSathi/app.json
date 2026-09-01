@@ -18,6 +18,15 @@
       "versionCode": 1
     },
     "owner": "darknessfallxd",
-    "plugins": ["expo-web-browser"]
+    "plugins": [
+    "expo-web-browser",
+    [
+      "expo-speech-recognition",
+      {
+        "microphonePermission": "Allow StyleSathi to use the microphone for voice search.",
+        "speechRecognitionPermission": "Allow StyleSathi to use speech recognition for voice search."
+      }
+    ]
+  ]
   }
 }

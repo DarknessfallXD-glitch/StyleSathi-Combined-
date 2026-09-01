@@ -24,6 +24,7 @@ import BottomTab from '../comp/BottomTab';
 import { Skeleton } from '../comp/Skeleton';
 import { searchProducts, SearchProduct } from '../services/search';
 import { addToWishlist, removeFromWishlist, isInWishlist } from '../utils/wishlist';
+import { useSpeechToText } from '../hooks/useSpeechToText';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 52) / 2;
@@ -125,6 +126,19 @@ export default function SearchResultsScreen() {
   const [selectedSort, setSelectedSort] = useState<string | null>(null);
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+
+  const {
+    isListening,
+    transcript,
+    interimTranscript,
+    startListening,
+    stopListening,
+  } = useSpeechToText((finalTranscript) => {
+    setSearchQuery(finalTranscript);
+    handleSubmitSearch();
+  });
+
+  const displayText = isListening ? interimTranscript || transcript : searchQuery;
 
   // 👇 REPLACED useEffect with useFocusEffect
   useFocusEffect(
@@ -339,10 +353,11 @@ export default function SearchResultsScreen() {
             placeholder="Search for jewelry..."
             placeholderTextColor={colors.placeholder}
             style={[styles.searchInput, { color: colors.inputText }]}
-            value={searchQuery}
+            value={displayText}
             onChangeText={setSearchQuery}
             onSubmitEditing={handleSubmitSearch}
             returnKeyType="search"
+            editable={!isListening}
           />
           <View style={styles.searchActions}>
             {searching && <ActivityIndicator size="small" color={colors.primary} style={styles.searchSpinner} />}
@@ -362,6 +377,17 @@ export default function SearchResultsScreen() {
             )}
             <TouchableOpacity onPress={handleSubmitSearch} style={styles.searchActionButton}>
               <Icon name="arrow-right" size={18} color={colors.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={isListening ? stopListening : startListening}
+              style={[styles.micButton, isListening && styles.micButtonActive]}
+              activeOpacity={0.7}
+            >
+              <Icon
+                name={isListening ? "stop" : "microphone"}
+                size={20}
+                color={isListening ? "#FF6B8A" : colors.primary}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -772,4 +798,6 @@ searchActionButton: {
 searchSpinner: {
   marginRight: 4,
 },
+micButton: { padding: 8, marginLeft: 4 },
+micButtonActive: { backgroundColor: '#FFF0F2', borderRadius: 20 },
 });

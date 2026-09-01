@@ -43,6 +43,8 @@ import {
   clearSearchHistory,
 } from "../utils/searchHistory";
 
+import { useSpeechToText } from "../hooks/useSpeechToText";
+
 // ==================== SKELETON COMPONENTS (unchanged) ====================
 const ProductCardSkeleton = () => {
   const { colors } = useTheme();
@@ -306,6 +308,21 @@ export default function HomeScreen() {
     );
   };
 
+  // ----- Speech to Text hook (must be at top level) -----
+  const {
+    isListening,
+    transcript,
+    interimTranscript,
+    startListening,
+    stopListening,
+  } = useSpeechToText((finalTranscript) => {
+    setSearchText(finalTranscript);
+    handleSearch();
+  });
+
+  // Use interim transcript for live display while listening
+  const displayText = isListening ? interimTranscript || transcript : searchText;
+
   // ----- Loading & Error states -----
   if (loading && !error) {
     return <HomeSkeleton />;
@@ -326,7 +343,6 @@ export default function HomeScreen() {
     );
   }
 
-  // ----- Main render -----
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
@@ -360,13 +376,25 @@ export default function HomeScreen() {
             placeholder="Describe what you want..."
             placeholderTextColor={colors.placeholder}
             style={[styles.searchInput, { color: colors.inputText }]}
-            value={searchText}
+            value={displayText}
             onChangeText={setSearchText}
             onSubmitEditing={handleSearch}
             returnKeyType="search"
+            editable={!isListening}
           />
-          <TouchableOpacity onPress={handleSearch}>
+          <TouchableOpacity onPress={handleSearch} style={styles.searchActionButton}>
             <Icon name="arrow-right" size={18} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={isListening ? stopListening : startListening}
+            style={[styles.micButton, isListening && styles.micButtonActive]}
+            activeOpacity={0.7}
+          >
+            <Icon
+              name={isListening ? "stop" : "microphone"}
+              size={20}
+              color={isListening ? "#FF6B8A" : colors.primary}
+            />
           </TouchableOpacity>
         </View>
 
@@ -478,6 +506,9 @@ const styles = StyleSheet.create({
   },
   searchIcon: { marginRight: 10 },
   searchInput: { flex: 1, fontSize: 14, paddingVertical: 12 },
+  searchActionButton: { padding: 8, marginLeft: 4 },
+  micButton: { padding: 8, marginLeft: 4 },
+  micButtonActive: { backgroundColor: '#FFF0F2', borderRadius: 20 },
   section: { marginBottom: 28 },
   recentSectionHeader: {
     flexDirection: "row",

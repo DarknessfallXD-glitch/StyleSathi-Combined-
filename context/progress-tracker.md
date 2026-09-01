@@ -34,6 +34,14 @@ Update this file after every meaningful implementation change.
 - Unit 2: Frontend search results wiring (Reejana) — see `context/specs/02-frontend-search.md`.
 - Run `scripts/seed_product_images.py` once Cloudinary creds are set.
 
+## Completed (Speech-to-Text Feature)
+
+- Created `src/hooks/useSpeechToText.ts` — reusable hook using `expo-speech-recognition` with permissions, error handling, and callbacks
+- Integrated speech-to-text on Home page (`src/app/home.tsx`) — microphone button in search bar, converts speech to text, triggers search on final result
+- Integrated speech-to-text on Search Results page (`src/app/search-result.tsx`) — same functionality for search page
+- Added `expo-speech-recognition` plugin to `app.json` with microphone and speech recognition permissions
+- Uses on-device speech recognition (iOS SFSpeechRecognizer, Android SpeechRecognizer, Web SpeechRecognition API)
+
 ## Open Questions
 
 - Confirm the Cloudinary account/credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET).
