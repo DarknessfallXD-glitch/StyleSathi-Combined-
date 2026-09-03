@@ -15,7 +15,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '@expo/vector-icons/FontAwesome';
 import { useTheme } from '../Context/ThemeContext';
 import { ThemedText } from '../comp/ThemedText';
 import { ProductCard } from '../comp/ProductCard';

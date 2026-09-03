@@ -25,17 +25,21 @@ def search_products(
     category: str | None = None
 ) -> list[dict]:
     try:
+        # ivfflat is approximate: it only visits a subset of index lists, so it
+        # can miss nearby vectors unless we request far more candidates than we
+        # finally return. Ask for a larger pool, then trim back to `limit`.
+        probe_count = max(int(limit) * 5, 200)
         rpc_params = {
             "query_embedding": query_embedding,
-            "match_threshold": 0.2, # this can be chnages to see how precisley items should match
-            "match_count": limit,
+            "match_threshold": 0.4, # lower = more lenient matching (demo-friendly)
+            "match_count": probe_count,
             "filter_location": location,
         }
         if category:
             rpc_params["filter_category"] = category
 
         result = supabase.rpc("match_products", rpc_params).execute()
-        return result.data
+        return result.data[:limit]
     except Exception as e:
         raise AppException(f"Vector search failed: {str(e)}", 500)
 

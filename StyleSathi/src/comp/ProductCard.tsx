@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '@expo/vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import { useTheme } from '../Context/ThemeContext';
 import { lightHaptic, successHaptic } from '../utils/haptic';

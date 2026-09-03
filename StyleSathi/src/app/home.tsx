@@ -255,8 +255,7 @@ export default function HomeScreen() {
     setSearchText("");
     const updated = await getSearchHistory();
     setRecentSearches(updated);
-    // (Optionally navigate to search results page)
-    // router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+    router.push({ pathname: "/search-result", params: { q: trimmed } });
   };
 
   const handleDeleteSearchTerm = async (term: string) => {

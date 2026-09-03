@@ -12,7 +12,7 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "@expo/vector-icons/FontAwesome";
 import BottomTab from "../comp/BottomTab";
 import { useTheme } from "../Context/ThemeContext";
 import { ThemedText } from "../comp/ThemedText";

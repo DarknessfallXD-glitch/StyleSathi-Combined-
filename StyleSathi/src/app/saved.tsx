@@ -12,7 +12,7 @@ import {
   Animated,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '@expo/vector-icons/FontAwesome';
 import { useTheme } from '../Context/ThemeContext';
 import { ThemedText } from '../comp/ThemedText';
 import { lightHaptic, successHaptic } from '../utils/haptic';

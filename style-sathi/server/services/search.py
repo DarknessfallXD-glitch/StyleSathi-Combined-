@@ -160,7 +160,9 @@ def process_search(
     # ---------- FALLBACK: if vector search returned nothing ----------
     if not vector_results:
         logger.info("Vector search returned no results; falling back to random products.")
-        fallback = supabase_client.table("products").select("*").limit(limit).execute()
+        from services.products import supabase as public_products_client
+        client = supabase_client or public_products_client
+        fallback = client.table("products").select("*").limit(limit).execute()
         vector_results = fallback.data
         for item in vector_results:
             item["score"] = 0.5          # neutral score
@@ -185,6 +187,10 @@ def process_search(
     
 
     all_results.sort(key=lambda x: x.get("score", 0), reverse=True)
+
+    for item in all_results:
+        item.pop("embedding", None)
+
     top_results = all_results[:3]
     more_results = all_results[3:]
 
