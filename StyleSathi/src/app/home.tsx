@@ -44,6 +44,7 @@ import {
 } from "../utils/searchHistory";
 
 import { useSpeechToText } from "../hooks/useSpeechToText";
+import { VoiceIndicator } from "../comp/VoiceIndicator";
 
 // ==================== SKELETON COMPONENTS (unchanged) ====================
 const ProductCardSkeleton = () => {
@@ -385,17 +386,20 @@ export default function HomeScreen() {
           <TouchableOpacity onPress={handleSearch} style={styles.searchActionButton}>
             <Icon name="arrow-right" size={18} color={colors.primary} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={isListening ? stopListening : startListening}
-            style={[styles.micButton, isListening && styles.micButtonActive]}
-            activeOpacity={0.7}
-          >
-            <Icon
-              name={isListening ? "stop" : "microphone"}
-              size={20}
-              color={isListening ? "#FF6B8A" : colors.primary}
-            />
-          </TouchableOpacity>
+          <View style={styles.voiceIndicatorWrapper}>
+            <VoiceIndicator isListening={isListening} size={40} />
+            <TouchableOpacity
+              onPress={isListening ? stopListening : startListening}
+              style={[styles.micButton, isListening && styles.micButtonActive]}
+              activeOpacity={0.7}
+            >
+              <Icon
+                name={isListening ? "stop" : "microphone"}
+                size={20}
+                color={isListening ? "#FF6B8A" : colors.primary}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Recent Searches Section */}
@@ -509,6 +513,14 @@ const styles = StyleSheet.create({
   searchActionButton: { padding: 8, marginLeft: 4 },
   micButton: { padding: 8, marginLeft: 4 },
   micButtonActive: { backgroundColor: '#FFF0F2', borderRadius: 20 },
+  voiceIndicatorWrapper: { 
+    position: 'relative', 
+    marginLeft: 4,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   section: { marginBottom: 28 },
   recentSectionHeader: {
     flexDirection: "row",
