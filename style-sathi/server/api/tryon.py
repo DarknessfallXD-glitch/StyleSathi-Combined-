@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException
+from starlette.concurrency import run_in_threadpool
 from api.user import checkAuth, get_supabase
 from services.tryon import generate_try_on
 from core.AppException import AppException
 import base64
+import traceback
 
 tryon_router = APIRouter()
 
@@ -10,8 +12,10 @@ tryon_router = APIRouter()
 @tryon_router.post("/generate")
 async def generate_tryon(
     user_image: UploadFile = File(..., description="Photo of the user"),
-    product_image: UploadFile = File(..., description="Product clothing image"),
-    prompt: str | None = Form(None, description="Optional custom prompt for FLUX"),
+    product_image: UploadFile = File(...,
+                                     description="Product clothing image"),
+    prompt: str | None = Form(
+        None, description="Optional custom prompt for FLUX"),
     info=Depends(checkAuth),
 ):
     if not user_image.content_type or not user_image.content_type.startswith("image/"):
@@ -32,12 +36,19 @@ async def generate_tryon(
 
     supabase_client = get_supabase(info["token"])
 
-    result = generate_try_on(
-        user_image_data=user_image_b64,
-        product_image_data=product_image_b64,
-        user_id=info["sub"],
-        supabase_client=supabase_client,
-        prompt=prompt,
-    )
+    try:
+        result = generate_try_on(
+            user_image_data=user_image_b64,
+            product_image_data=product_image_b64,
+            user_id=info["sub"],
+            supabase_client=supabase_client,
+            prompt=prompt,
+        )
+    except Exception as e:
+        print("\n========== TRY-ON ERROR ==========")
+        traceback.print_exc()
+        print("Error message:", str(e))
+        print("==================================\n")
+        raise
 
     return result
