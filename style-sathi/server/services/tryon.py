@@ -47,7 +47,10 @@ def get_flux_service() -> BaseFluxService:
         return ReplicateFluxService()
     if COLAB_FLUX_URL:
         return ColabFluxService(COLAB_FLUX_URL)
-    raise AppException("No FLUX service configured (set REPLICATE_API_TOKEN or COLAB_FLUX_URL)", 500)
+    raise AppException(
+        "AI try-on is not configured. Set REPLICATE_API_TOKEN or COLAB_FLUX_URL in the backend .env.",
+        503,
+    )
 
 
 class ReplicateFluxService(BaseFluxService):
@@ -150,6 +153,10 @@ def generate_try_on(
     supabase_client: Client,
     prompt: str | None = None,
 ) -> dict:
+    # Resolve the provider before consuming the user's daily/free quota so a
+    # misconfigured backend does not burn tries on failed requests.
+    service = get_flux_service()
+
     usage = check_usage_and_increment(supabase_client, user_id)
 
     from schemas.taskBody import GenerationTask
@@ -160,7 +167,6 @@ def generate_try_on(
         prompt=prompt or "A person wearing this clothing item naturally, photorealistic, high quality",
     )
 
-    service = get_flux_service()
     try:
         result_image = service.generate(task)
     except Exception as e:
@@ -173,7 +179,6 @@ def generate_try_on(
         supabase_client.table("tryon_history").insert({
             "user_id": user_id,
             "result_url": image_url,
-            "created_at": "now()",
         }).execute()
     except Exception as e:
         logger.warning(f"Failed to save try-on history: {str(e)}")

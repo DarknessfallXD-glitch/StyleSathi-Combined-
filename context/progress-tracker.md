@@ -42,6 +42,18 @@ Update this file after every meaningful implementation change.
 - Added `expo-speech-recognition` plugin to `app.json` with microphone and speech recognition permissions
 - Uses on-device speech recognition (iOS SFSpeechRecognizer, Android SpeechRecognizer, Web SpeechRecognition API)
 
+## Completed (Try-On Integration Fix)
+
+- Fixed frontend/backend contract mismatch: `try-on.tsx` now calls `POST /try-on/generate` with `user_image`/`product_image` multipart fields and reads `generated_image_url` (previously called `POST /try-on` and read `image_url`, causing 404).
+- Try-on requests now attach the Supabase `authToken` as a bearer token (the backend endpoint requires `checkAuth`).
+- Replaced deprecated `expo-file-system` v19 APIs (`cacheDirectory`/`downloadAsync`) with `Paths.cache` + `File.downloadFileAsync`.
+- `try-on.tsx` now uses the shared `API_BASE_URL` from `src/lib/config.ts`; dev builds derive the API host from Expo's Metro host or `EXPO_PUBLIC_API_URL` instead of a hardcoded LAN IP.
+- Replaced unavailable `react-native-vector-icons` imports with `@expo/vector-icons/FontAwesome` across all screens/components.
+- Backend: provider is resolved before consuming a free/daily try, missing `REPLICATE_API_TOKEN`/`COLAB_FLUX_URL` now returns a clear 503, and `tryon_history.created_at` no longer inserts the literal string `"now()"`.
+- Verified: `npx tsc --noEmit` passes, `npx expo export --platform web` bundles successfully, FastAPI starts and exposes `/try-on/generate` with the expected fields.
+- Remaining config step: set `REPLICATE_API_TOKEN` or `COLAB_FLUX_URL` in `style-sathi/server/.env`, and ensure the `tryon-images` Supabase storage bucket exists.
+
+
 ## Open Questions
 
 - Confirm the Cloudinary account/credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET).

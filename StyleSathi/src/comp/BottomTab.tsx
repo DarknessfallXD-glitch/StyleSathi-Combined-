@@ -1,10 +1,10 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "@expo/vector-icons/FontAwesome";
 import { useTheme } from "../Context/ThemeContext";
 
-export default function BottomTab({ active }) {
+export default function BottomTab({ active }: { active: string }) {
   const router = useRouter();
   const { colors, isDarkMode } = useTheme();
 
@@ -19,7 +19,7 @@ export default function BottomTab({ active }) {
     { name: "Try-On", label: "try-on", icon: "camera", route: "./try-on" },
     { name: "saved", label: "saved", icon: "heart-o", route: "./saved" },
     { name: "profile", label: "profile", icon: "user", route: "./profile" },
-  ];
+  ] as const;
 
   return (
     <View

@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "@expo/vector-icons/FontAwesome";
 import { useTheme } from "../Context/ThemeContext";
 import { ThemedText } from "../comp/ThemedText";
 
@@ -125,7 +125,14 @@ export default function ProductDetailScreen() {
         <>
           <ThemedText style={styles.sectionTitle}>FEATURES</ThemedText>
           <View style={styles.featuresRow}>
-            {features.map((feature, idx) => (
+            {features.map(
+              (
+                feature: {
+                  icon: React.ComponentProps<typeof Icon>["name"];
+                  text: string;
+                },
+                idx: number,
+              ) => (
               <View key={idx} style={styles.featureItem}>
                 <Icon name={feature.icon} size={20} color={colors.primary} />
                 <Text style={[styles.featureText, { color: colors.text }]}>
@@ -142,7 +149,8 @@ export default function ProductDetailScreen() {
         SELECT RETAILER TO BUY
       </ThemedText>
       {retailers.length > 0 ? (
-        retailers.map((retailer, index) => (
+        retailers.map(
+          (retailer: { name: string; price: string }, index: number) => (
           <TouchableOpacity
             key={index}
             style={[styles.retailerCard, { backgroundColor: colors.surface }]}

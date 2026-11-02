@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../Context/ThemeContext';
 import { ThemedText } from '../comp/ThemedText';
@@ -88,7 +88,7 @@ export default function SettingsScreen() {
     onPress,
     onValueChange,
   }: {
-    icon: string;
+    icon: React.ComponentProps<typeof Icon>['name'];
     title: string;
     subtitle?: string;
     type?: 'link' | 'toggle' | 'select';

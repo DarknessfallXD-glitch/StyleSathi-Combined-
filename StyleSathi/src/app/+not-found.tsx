@@ -7,7 +7,7 @@ import {
   Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '@expo/vector-icons/FontAwesome';
 
 export default function NotFoundScreen() {
   const router = useRouter();

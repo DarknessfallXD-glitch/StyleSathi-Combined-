@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { Platform } from 'react-native';
 import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
@@ -38,31 +39,61 @@ export function useSpeechToText(
   };
 
   useSpeechRecognitionEvent('start', () => {
+    console.log('[Speech] Recognition started');
     setIsListening(true);
     setError(null);
   });
 
   useSpeechRecognitionEvent('end', () => {
+    console.log('[Speech] Recognition ended');
     setIsListening(false);
   });
 
-  useSpeechRecognitionEvent('result', (event: ExpoSpeechRecognitionResultEvent) => {
-    if (event.results && event.results.length > 0) {
-      const result = event.results[0];
-      if (event.isFinal) {
-        setTranscript(result.transcript);
-        setInterimTranscript('');
-        onResult?.(result.transcript);
-      } else {
-        setInterimTranscript(result.transcript);
+  useSpeechRecognitionEvent(
+    'result',
+    (event: ExpoSpeechRecognitionResultEvent) => {
+      console.log('[Speech] Result event:', event);
+
+      if (event.results && event.results.length > 0) {
+        const results = Array.from(event.results);
+        const result = results[results.length - 1];
+
+        if (!result?.transcript) {
+          return;
+        }
+
+        if (event.isFinal) {
+          const finalText = results
+            .filter((item) => item?.transcript)
+            .map((item) => item.transcript)
+            .join(' ')
+            .trim();
+
+          if (finalText) {
+            setTranscript((previous) =>
+              previous ? `${previous} ${finalText}` : finalText
+            );
+            setInterimTranscript('');
+            onResult?.(finalText);
+          }
+        } else {
+          setInterimTranscript(result.transcript);
+        }
       }
     }
-  });
+  );
 
   useSpeechRecognitionEvent('error', (event) => {
+    console.error('[Speech] Recognition error:', event);
+
     setIsListening(false);
-    const errorMessage = event.message || `Speech recognition error: ${event.error}`;
+
+    const errorMessage =
+      event.message ||
+      `Speech recognition error: ${event.error}`;
+
     setError(errorMessage);
+
     Toast.show({
       type: 'error',
       text1: 'Speech Recognition Error',
@@ -71,67 +102,151 @@ export function useSpeechToText(
   });
 
   const checkPermissions = useCallback(async () => {
+    if (Platform.OS === 'web') {
+      try {
+        const available =
+          ExpoSpeechRecognitionModule.isRecognitionAvailable();
+
+        console.log('[Speech] Recognition available:', available);
+        setHasPermissions(available);
+        return available;
+      } catch (err) {
+        console.error('[Speech] Availability check failed:', err);
+        setHasPermissions(false);
+        return false;
+      }
+    }
+
     try {
-      const result = await ExpoSpeechRecognitionModule.getPermissionsAsync();
+      const result =
+        await ExpoSpeechRecognitionModule.getPermissionsAsync();
+
       setHasPermissions(result.granted === true);
       return result.granted === true;
-    } catch {
+    } catch (err) {
+      console.error('[Speech] Permission check failed:', err);
       setHasPermissions(false);
       return false;
     }
   }, []);
 
   const requestPermissions = useCallback(async () => {
+    if (Platform.OS === 'web') {
+      try {
+        const available =
+          ExpoSpeechRecognitionModule.isRecognitionAvailable();
+
+        console.log('[Speech] Web recognition available:', available);
+        setHasPermissions(available);
+        return available;
+      } catch (err) {
+        console.error('[Speech] Web availability check failed:', err);
+        setHasPermissions(false);
+        return false;
+      }
+    }
+
     try {
-      const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      const result =
+        await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+
       const granted = result.granted === true;
       setHasPermissions(granted);
       return granted;
-    } catch {
+    } catch (err) {
+      console.error('[Speech] Permission request failed:', err);
       setHasPermissions(false);
       return false;
     }
   }, []);
 
   useEffect(() => {
-    checkPermissions();
+    void checkPermissions();
   }, [checkPermissions]);
 
   const startListening = useCallback(async () => {
     setError(null);
     setInterimTranscript('');
 
-    const permitted = await requestPermissions();
-    if (!permitted) {
-      setError('Microphone and speech recognition permissions are required');
-      Toast.show({
-        type: 'error',
-        text1: 'Permission Denied',
-        text2: 'Please enable microphone and speech recognition permissions in settings',
-      });
-      return;
-    }
-
     try {
+      const available =
+        ExpoSpeechRecognitionModule.isRecognitionAvailable();
+
+      console.log('[Speech] Platform:', Platform.OS);
+      console.log('[Speech] Recognition available:', available);
+
+      if (!available) {
+        const message =
+          'Speech recognition is unavailable in this browser. Try a supported browser such as Chrome.';
+
+        setError(message);
+
+        Toast.show({
+          type: 'error',
+          text1: 'Speech Recognition Unavailable',
+          text2: message,
+        });
+
+        return;
+      }
+
+      if (Platform.OS !== 'web') {
+        const permitted = await requestPermissions();
+
+        if (!permitted) {
+          const message =
+            'Microphone and speech recognition permissions are required.';
+
+          setError(message);
+
+          Toast.show({
+            type: 'error',
+            text1: 'Permission Denied',
+            text2: message,
+          });
+
+          return;
+        }
+      }
+
+      console.log('[Speech] Starting with options:', defaultOptions);
+
       ExpoSpeechRecognitionModule.start(defaultOptions);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to start speech recognition';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Failed to start speech recognition';
+
+      console.error('[Speech] Start failed:', err);
+
       setError(errorMessage);
       setIsListening(false);
+
       Toast.show({
         type: 'error',
-        text1: 'Error',
+        text1: 'Speech Recognition Error',
         text2: errorMessage,
       });
     }
   }, [defaultOptions, requestPermissions]);
 
   const stopListening = useCallback(() => {
-    ExpoSpeechRecognitionModule.stop();
+    try {
+      ExpoSpeechRecognitionModule.stop();
+    } catch (err) {
+      console.error('[Speech] Stop failed:', err);
+      setIsListening(false);
+    }
   }, []);
 
   const abortListening = useCallback(() => {
-    ExpoSpeechRecognitionModule.abort();
+    try {
+      ExpoSpeechRecognitionModule.abort();
+    } catch (err) {
+      console.error('[Speech] Abort failed:', err);
+    }
+
     setIsListening(false);
     setInterimTranscript('');
   }, []);

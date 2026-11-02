@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "@expo/vector-icons/FontAwesome";
 import { supabase } from "../lib/supabase";
 import { getUserProfile } from "../services/api/user";
 
@@ -222,7 +222,10 @@ export default function SignUpScreen() {
               console.log("Session data:", sessionData);
               if (sessionError) throw sessionError;
               if (sessionData.session) {
-                data = sessionData;
+                data = {
+                  ...sessionData,
+                  user: sessionData.session.user,
+                };
               } else {
                 throw new Error("User exists but no session");
               }

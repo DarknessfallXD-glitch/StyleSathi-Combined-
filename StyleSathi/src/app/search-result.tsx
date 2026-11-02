@@ -15,7 +15,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '@expo/vector-icons/FontAwesome';
 import { useTheme } from '../Context/ThemeContext';
 import { ThemedText } from '../comp/ThemedText';
 import { ProductCard } from '../comp/ProductCard';
@@ -35,7 +35,7 @@ const SORT_OPTIONS = [
   { id: 'price_asc', label: 'Price: Low to High', icon: 'arrow-up' },
   { id: 'price_desc', label: 'Price: High to Low', icon: 'arrow-down' },
   { id: 'name_asc', label: 'Name: A to Z', icon: 'sort-alpha-asc' },
-];
+] as const;
 
 // ==================== SKELETON COMPONENTS ====================
 const ProductCardSkeleton = () => {
@@ -224,7 +224,7 @@ export default function SearchResultsScreen() {
       await addToWishlist({
         id: item.id,
         name: item.name,
-        price: item.price,
+        price: String(item.price),
         category: item.category,
         image: item.image,
       });
@@ -316,7 +316,14 @@ export default function SearchResultsScreen() {
     return (
       <ProductCard
         key={item.id}
-        item={item}
+        item={{
+          id: item.id,
+          name: item.name,
+          price: String(item.price),
+          category: item.category,
+          image: item.image,
+          tag: item.tag ?? '',
+        }}
         onPress={onCardPress}
         isWishlisted={isWishlisted}
         onToggleWishlist={onToggle}

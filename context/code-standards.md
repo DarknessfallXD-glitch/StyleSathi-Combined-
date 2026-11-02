@@ -51,5 +51,5 @@
 ## Ownership
 
 - **Utsav (backend)**: any change under `style-sathi/server/` — search, affiliate, try-on, auth, subscriptions.
-- **Reejana (frontend/UI)**: any change under `StyleSathi/src/` — screens, components, theming, navigation.
+- **Reejan (frontend/UI)**: any change under `StyleSathi/src/` — screens, components, theming, navigation.
 - Code that spans the boundary (new endpoint + screen) is coordinated together; keep backend/API change and frontend wiring as separate review units.
